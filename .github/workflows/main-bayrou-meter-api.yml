@@ -52,6 +52,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r api/requirements.txt
+        
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B2639E2E7F9D4C03A183009B8D3C6645 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_5B174918A3A64E28B4F601820B1A8047 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_757620BAD0E846858E3A366FB06B3621 }}
 
       # Deploy the API to Azure Functions App
       - name: Deploy to Azure Functions
