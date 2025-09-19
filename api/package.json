@@ -1,0 +1,12 @@
+{
+  "name": "bayrou-meter-api",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "func start",
+    "start": "func start",
+    "build": "echo 'No build step needed for Python Azure Functions'",
+    "clean": "rm -rf __pycache__ .python_packages"
+  },
+  "devDependencies": {}
+}
