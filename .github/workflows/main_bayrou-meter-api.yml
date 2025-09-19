@@ -39,7 +39,7 @@ jobs:
       shell: bash
       run: |
         pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-        pip install pytest
+        pip install -r requirements.txt
         popd
 
     - name: 'Run Unit Tests'
