@@ -1,0 +1,64 @@
+name: Deploy Python project to Azure Function App
+
+on:
+  push:
+    branches: ["main"]
+    paths: ['api/**', '.github/workflows/main-bayrou-meter-api.yml'] 
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Download the source code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install Python runtime environment
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # Install all required dependencies and testing tools
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r api/requirements.txt
+          pip install pytest azure-functions bcrypt
+      
+      # Execute unit tests to validate code quality
+      - name: Run tests
+        run: |
+          cd api
+          python -m pytest tests/test_integration.py -v
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-test
+    steps:
+      # Download the source code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Install Python runtime environment for deployment
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      # Install production dependencies for the API
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r api/requirements.txt
+
+      # Deploy the API to Azure Functions App
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: 'bayrou-meter-api'
+          package: './api' 
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          scm-do-build-during-deployment: true
+          enable-oryx-build: true
