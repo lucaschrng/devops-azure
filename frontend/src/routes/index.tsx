@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import UserForm from '../components/UserForm'
+import Header from '../components/Header'
 import VoteForm from '../components/VoteForm'
 import VoteResults from '../components/VoteResults'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { User } from '../types/api'
 
 export const Route = createFileRoute('/')({
@@ -27,10 +29,21 @@ function BayrouMeterApp() {
     setHasVoted(false)
   }
 
+  const handleLogout = () => {
+    setCurrentUser(null)
+    setHasVoted(false)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Header 
+        currentUser={currentUser} 
+        onUserCreated={handleUserCreated}
+        onLogout={handleLogout}
+      />
+      
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-gray-800 mb-4">
             🗳️ Bayrou Meter
@@ -42,12 +55,6 @@ function BayrouMeterApp() {
         </div>
 
         <div className="space-y-12">
-          {/* Étape 1: Identification utilisateur */}
-          {!currentUser && (
-            <section>
-              <UserForm onUserCreated={handleUserCreated} />
-            </section>
-          )}
 
           {/* Étape 2: Vote */}
           {currentUser && !hasVoted && (
@@ -59,22 +66,21 @@ function BayrouMeterApp() {
           {/* Étape 3: Confirmation et bouton pour nouveau vote */}
           {currentUser && hasVoted && (
             <section>
-              <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-6 text-center">
-                <div className="text-green-600 text-5xl mb-4">✅</div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                  Vote enregistré !
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  Merci {currentUser.pseudo} pour votre participation.
-                  Découvrez les résultats ci-dessous.
-                </p>
-                <button
-                  onClick={handleNewUser}
-                  className="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                >
-                  Nouveau vote
-                </button>
-              </div>
+              <Card className="max-w-md mx-auto text-center">
+                <CardHeader>
+                  <div className="text-green-600 text-5xl mb-4">✅</div>
+                  <CardTitle className="text-2xl">Vote enregistré !</CardTitle>
+                  <CardDescription>
+                    Merci {currentUser.pseudo} pour votre participation.
+                    Découvrez les résultats ci-dessous.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={handleNewUser} className="w-full">
+                    Nouveau vote
+                  </Button>
+                </CardContent>
+              </Card>
             </section>
           )}
 

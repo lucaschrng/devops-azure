@@ -4,6 +4,7 @@ import json
 import logging
 import uuid
 import os
+import bcrypt
 from azure.cosmos import CosmosClient, PartitionKey, exceptions
 
 app = func.FunctionApp()
@@ -38,7 +39,7 @@ def get_container(database, container_name, partition_key_path):
 
 @app.route(route="user", methods=["POST"], auth_level=func.AuthLevel.ANONYMOUS)
 def createUser(req: func.HttpRequest) -> func.HttpResponse:
-    """Endpoint POST /user pour créer un utilisateur (pseudo + email)"""
+    """Endpoint POST /user pour créer un utilisateur (pseudo + email + password)"""
     logging.info('Processing POST /user request')
 
     try:
@@ -53,10 +54,11 @@ def createUser(req: func.HttpRequest) -> func.HttpResponse:
 
         pseudo = req_body.get('pseudo')
         email = req_body.get('email')
+        password = req_body.get('password')
 
-        if not pseudo or not email:
+        if not pseudo or not email or not password:
             return func.HttpResponse(
-                json.dumps({"error": "Both pseudo and email are required"}),
+                json.dumps({"error": "Pseudo, email and password are required"}),
                 mimetype="application/json",
                 status_code=400
             )
@@ -66,12 +68,18 @@ def createUser(req: func.HttpRequest) -> func.HttpResponse:
         database = get_database(client)
         users_container = get_container(database, USERS_CONTAINER, "/id")
 
+        # Hash du mot de passe
+        password_bytes = password.encode('utf-8')
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(password_bytes, salt)
+
         # Créer l'utilisateur
         user_id = str(uuid.uuid4())
         user_doc = {
             "id": user_id,
             "pseudo": pseudo,
             "email": email,
+            "password_hash": hashed_password.decode('utf-8'),
             "created_at": datetime.datetime.utcnow().isoformat()
         }
 
@@ -305,10 +313,11 @@ def loginUser(req: func.HttpRequest) -> func.HttpResponse:
             )
 
         email = req_body.get('email')
+        password = req_body.get('password')
 
-        if not email:
+        if not email or not password:
             return func.HttpResponse(
-                json.dumps({"error": "Email is required"}),
+                json.dumps({"error": "Email and password are required"}),
                 mimetype="application/json",
                 status_code=400
             )
@@ -324,12 +333,30 @@ def loginUser(req: func.HttpRequest) -> func.HttpResponse:
         
         if not users:
             return func.HttpResponse(
-                json.dumps({"error": "User not found"}),
+                json.dumps({"error": "Invalid email or password"}),
                 mimetype="application/json",
-                status_code=404
+                status_code=401
             )
 
         user = users[0]  # Premier utilisateur trouvé
+        
+        # Vérifier le mot de passe
+        stored_password_hash = user.get('password_hash')
+        
+        if not stored_password_hash:
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid email or password"}),
+                mimetype="application/json",
+                status_code=401
+            )
+        
+        # Vérifier le mot de passe
+        if not bcrypt.checkpw(password.encode('utf-8'), stored_password_hash.encode('utf-8')):
+            return func.HttpResponse(
+                json.dumps({"error": "Invalid email or password"}),
+                mimetype="application/json",
+                status_code=401
+            )
 
         return func.HttpResponse(
             json.dumps({
