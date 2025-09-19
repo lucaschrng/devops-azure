@@ -19,6 +19,20 @@ jobs:
         with:
           submodules: true
           lfs: false
+      
+      # Clean up unnecessary files to reduce deployment size
+      - name: Clean up files
+        run: |
+          echo "Cleaning up unnecessary files..."
+          # Remove any existing node_modules and dist folders
+          rm -rf frontend/node_modules frontend/dist
+          # Remove any cache directories
+          rm -rf frontend/.next frontend/.nuxt frontend/.output
+          # Remove development files
+          find frontend -name "*.log" -delete
+          find frontend -name ".DS_Store" -delete
+          echo "Cleanup completed"
+          
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -31,6 +45,7 @@ jobs:
           app_location: "./frontend" # App source code path
           # api_location: "./api" # Api source code path - REMOVED: API is deployed separately
           output_location: "dist" # Built app content directory - optional
+          skip_app_build: false
           ###### End of Repository/Build Configurations ######
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
