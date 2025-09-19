@@ -69,7 +69,6 @@ jobs:
         uses: Azure/functions-action@v1
         with:
           app-name: 'bayrou-meter-api'
-          package: './api' 
-          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+          package: './api'
           scm-do-build-during-deployment: true
           enable-oryx-build: true
