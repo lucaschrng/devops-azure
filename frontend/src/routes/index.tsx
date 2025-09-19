@@ -3,9 +3,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import Header from '../components/Header'
 import VoteForm from '../components/VoteForm'
 import VoteResults from '../components/VoteResults'
+import type { User } from '../types/api'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import type { User } from '../types/api'
 
 export const Route = createFileRoute('/')({
   component: BayrouMeterApp,
@@ -36,12 +36,12 @@ function BayrouMeterApp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Header 
-        currentUser={currentUser} 
+      <Header
+        currentUser={currentUser}
         onUserCreated={handleUserCreated}
         onLogout={handleLogout}
       />
-      
+
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-12">

@@ -9,6 +9,7 @@ export interface User {
 export interface CreateUserRequest {
   pseudo: string;
   email: string;
+  password: string;
 }
 
 export interface CreateUserResponse {
@@ -18,6 +19,7 @@ export interface CreateUserResponse {
 
 export interface LoginUserRequest {
   email: string;
+  password: string;
 }
 
 export interface LoginUserResponse {

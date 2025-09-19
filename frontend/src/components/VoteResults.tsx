@@ -1,9 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { ThumbsDownIcon, ThumbsUpIcon } from 'lucide-react'
 import { apiQueries } from '../lib/api'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 
 export default function VoteResults() {
   const { data, isLoading, error } = useQuery(apiQueries.votes())
@@ -55,7 +54,7 @@ export default function VoteResults() {
     )
   }
 
-  const { stats, votes, question } = data
+  const { stats, votes } = data
 
   return (
     <div className="max-w-4xl mx-auto flex flex-col gap-8">
