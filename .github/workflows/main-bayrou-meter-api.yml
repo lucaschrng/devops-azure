@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'api/**'
   workflow_dispatch:
 
 env:
@@ -33,6 +35,14 @@ jobs:
         pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
         python -m pip install --upgrade pip
         pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+        popd
+
+    - name: 'Run tests'
+      shell: bash
+      run: |
+        pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+        pip install pytest azure-functions bcrypt requests
+        python -m pytest tests/test_integration.py -v
         popd
     
     - name: Login to Azure
